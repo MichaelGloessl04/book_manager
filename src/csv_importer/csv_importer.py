@@ -1,3 +1,6 @@
+import os
+import shutil
+import json
 import pandas as pd
 
 
@@ -16,5 +19,16 @@ class CSVImporter:
         Args:
             path (str): path to save the json files
         """
+        if not path.endswith('/'):
+            path += '/'
+
+        if os.path.exists(path):
+            shutil.rmtree(path)
+
+        os.mkdir(path)
+
         for index, row in self.df.iterrows():
-            row.to_json(path + str(index) + '.json')
+            filename = row['Titel'].replace(' ', '_').lower() + '.json'
+            row = {key.strip(): value for key, value in row.items()}
+            with open(path + filename, 'w') as file:
+                json.dump(row, file)
