@@ -1,7 +1,7 @@
 <!-- BookTile.vue -->
 
 <template>
-    <div :style="{ backgroundColor: randomColor }" class="book-tile">
+    <div :style="{ backgroundColor: randomColor, color: textColor }" class="book-tile">
         <div class="title-large">{{ book.Titel }}</div>
         <div class="author-small">{{ book.Autor }}</div>
     </div>
@@ -17,34 +17,38 @@ export default {
     },
     data() {
         return {
-            randomColor: this.getRandomColor(this.stringToSeed(this.book.Titel)),
+            randomColor: this.getRandomColor(),
+            textColor: this.calculateTextColor(this.getRandomColor()),
         };
     },
     methods: {
-        stringToSeed(title: string) {
-            let seed = 0;
-            for (let i = 0; i < title.length; i++) {
-                seed = (seed * 31 + title.charCodeAt(i)) & 0xffffffff;
-            }
-            return seed;
-        },
-        getRandomColor(seed: number) {
+        getRandomColor() {
             const random = () => Math.floor(Math.random() * 256);
-            const mix: any = { red: 201, green: 191, blue: 165 };
+            const mix: any = { red: 0, green: 0, blue: 255 };
 
             let red = random();
             let green = random();
             let blue = random();
 
-            const dilution = 12;
+            const rgbrand = Math.max(0, Math.min(0, 1));
 
             if (mix) {
-                red = (red + mix.red) / dilution;
-                green = (green + mix.green) / dilution;
-                blue = (blue + mix.blue) / dilution;
+                red = red + mix.red * (1 - rgbrand);
+                green = green + mix.green * (1 - rgbrand);
+                blue = blue + mix.blue * (1 - rgbrand);
             }
 
             return `rgb(${red}, ${green}, ${blue})`;
+        },
+        calculateTextColor(color: string) {
+            const rgb: any = color.match(/\d+/g);
+            const brightness = (parseInt(rgb[0]) * 299 + parseInt(rgb[1]) * 587 + parseInt(rgb[2]) * 114) / 1000;
+            return brightness >= 128 ? 'black' : 'white';
+        },
+    },
+    watch: {
+        randomColor(newColor: string) {
+            this.textColor = this.calculateTextColor(newColor);
         },
     },
 };
