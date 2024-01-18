@@ -1,9 +1,8 @@
-from csv_importer import CSVImporter
+import api
 
 
 def main():
-    cimp = CSVImporter('data/books.csv')
-    cimp.save('data/book_json')
+    api.run()
 
 
 if __name__ == '__main__':

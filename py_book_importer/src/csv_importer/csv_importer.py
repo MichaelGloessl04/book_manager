@@ -29,6 +29,8 @@ class CSVImporter:
 
         for index, row in self.df.iterrows():
             filename = row['Titel'].replace(' ', '_').lower() + '.json'
-            row = {key.strip(): value for key, value in row.items()}
+            row = {key.strip(): value.strip() 
+                   if isinstance(value, str) else value 
+                   for key, value in row.items()}
             with open(path + filename, 'w') as file:
                 json.dump(row, file)
